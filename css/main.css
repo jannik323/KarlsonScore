@@ -1,0 +1,133 @@
+@font-face {
+    font-family: bluensia;
+    src: url(/misc/bluenesia.regular.ttf);
+}
+
+*{
+    font-family: bluensia;
+    box-sizing: content-box;
+}
+
+
+body,html{
+    margin: 0px;
+    background-color: #ccc;
+}
+
+/* navbar */
+
+.navbar{
+    display:flex;
+    flex-direction: row;
+    background-color: #333;
+}
+
+.navbar>a{
+    color:#aaa;
+    text-decoration: none;
+    background-color: #333;
+    padding: 1rem;
+    transition: background-color .3s;
+}
+
+.navbar>a:hover{
+    color:#aaa;
+    text-decoration: none;
+    background-color: #555;
+}
+
+.navbar a.selected{
+    background-color: #555;
+}
+
+/* main */
+
+main.main{
+    padding: 1rem;
+}
+
+/* section */
+
+section.section{
+    display: flex;
+    flex-direction: column;
+}
+
+/* resulttable */
+
+table.resulttable {
+    margin: 1rem 0rem;
+    border-collapse: collapse;
+    cursor: default;
+    color:#ccc;
+}
+
+table.resulttable td, table.resulttable th{
+    padding: .5rem;
+}
+
+table.resulttable thead tr{
+    background-color: #333;
+}
+
+table.resulttable tbody tr:hover{
+    scale:1.05
+}
+
+table.resulttable tbody tr {
+    background-color: #666;
+}
+
+table.resulttable tbody tr:nth-child(odd) {
+    background-color: #555;
+}
+
+/* categoryselect */
+
+#categoryselect{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#categoryselect span{
+    background-color: #999;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+#categoryselect span:hover{
+    background-color: #888;
+}
+
+#categoryselect span.selected{
+    background-color: #666;
+}
+
+/* buttons */
+
+.green{
+    background-color: rgb(77, 131, 78);
+}
+
+button{
+    border: none;
+    padding: 0.5rem;
+    background-color: rgb(134, 134, 134);
+    color:#ccc;
+    width: max-content;
+}
+
+button:hover{
+    filter: brightness(1.1);
+}
+
+/* input text */
+
+input[type=text]{
+    border:none;
+    height: 90%;
+    outline: none;
+}
