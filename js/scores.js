@@ -42,10 +42,7 @@ let timeManager = new TimeManager();
 checkUpdate();
 setInterval(checkUpdate,1000);
 function checkUpdate(){
-    if(Date.now()>=karlsonScores.nextUpdate){
-        karlsonScores.nextUpdate=Date.now()+scoreTimeout;
-        updateScores();
-    }
+    if(Date.now()>=karlsonScores.nextUpdate)updateScores();
 }
 
 
@@ -179,6 +176,7 @@ function updateScores(){
         updateCommunityScores(data);
         updatePlayerScores();
         saveKarlsonScores();
+        karlsonScores.nextUpdate=Date.now()+scoreTimeout;
     },error=>{
         console.log(error);
         console.log("This is some serious Error my dude");
