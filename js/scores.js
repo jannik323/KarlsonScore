@@ -37,6 +37,7 @@ class Player{
         karlsonScores=JSON.parse(karlsonScores_temp);
     }
 }
+let timeManager = new TimeManager();
 
 checkUpdate();
 setInterval(checkUpdate,1000);
@@ -44,7 +45,6 @@ function checkUpdate(){
     if(Date.now()>=karlsonScores.nextUpdate){
         karlsonScores.nextUpdate=Date.now()+scoreTimeout;
         updateScores();
-        saveKarlsonScores();
     }
 }
 
@@ -88,8 +88,7 @@ function addPlayer(){
     }
 
     addPlayerBtn.disabled=true;
-    getData(("https://www.speedrun.com/api/v1/users/"+newPlayer.name+"/personal-bests?game="+IDs.karlson+"&max=200"
-    ),data=>{
+    timeManager.getPlayerData(newPlayer.name,data=>{
         karlsonScores.cats[newPlayer.category].push(newPlayer);
         calculateScores(newPlayer,data);
         saveKarlsonScores();
@@ -139,70 +138,44 @@ function saveKarlsonScores(data=karlsonScores){
     localStorage.setItem("karlsonScores",JSON.stringify(data));
 }
 
-function getData(URL,callback,error){
-    fetch(URL).then(response => {
-        if (!response.ok) {
-            error(response.status);
-            throw new Error("Request failed with status "+response.status);
-        }
-        return response.json();
-    })
-    .then(data=>callback(data))
-    .catch(errordata=>error(errordata));
-}
-
 function calculateScores(player,data){
     let levelcount = 0;
     let totalleveltimes = 0;
-    let fullgametime = null;
-    for(rundata of data.data){
-        if(player.category=="ae"&&rundata.run.category===IDs.cat.level.any&&rundata.run.level===IDs.lvl.sand2){
-            levelcount++;
-            totalleveltimes+=Number.parseFloat(rundata.run.times.primary_t);
-        }
-        if(rundata.run.category===IDs.cat.level[player.category]){
-            levelcount++;
-            totalleveltimes+=Number.parseFloat(rundata.run.times.primary_t);
-            continue;
-        };
-        if(rundata.run.category===IDs.cat.full[player.category]){
-            fullgametime=Number.parseFloat(rundata.run.times.primary_t);
-        }
+    for(let time in data.cats.level[player.category]){
+        let leveltime = data.cats.level[player.category][time];
+        if(leveltime==null)continue;
+        levelcount++;
+        totalleveltimes+=leveltime;
     }
     if(levelcount==11){
         player.level=((karlsonScores.community[player.category].level/totalleveltimes)*100).toFixed(2);
+    }else{
+        totalleveltimes=null;
     }
-    if(fullgametime!=null){
-        player.fullgame=((karlsonScores.community[player.category].fullgame/fullgametime)*100).toFixed(2);
+    
+    if(data.cats.fullgame[player.category]!=null){
+        player.fullgame=((karlsonScores.community[player.category].fullgame/data.cats.fullgame[player.category])*100).toFixed(2);
     }
-    player.total=((karlsonScores.community[player.category].total/(fullgametime*totalleveltimes))*100).toFixed(2);
+
+    if(levelcount==11&&data.cats.fullgame[player.category]!=null){
+        player.total=((karlsonScores.community[player.category].total/(data.cats.fullgame[player.category]*totalleveltimes))*100).toFixed(2);
+    }
 
 }
 
 function calculateCommunityScores(player,data){
+
     let totalleveltimes = 0;
-    let fullgametime = 0;
-    for(rundata of data.data){
-        let run = rundata.runs[0].run;
-        if(player.category=="ae"&&run.category===IDs.cat.level.any&&run.level===IDs.lvl.sand2){
-            totalleveltimes+=Number.parseFloat(run.times.primary_t);
-        }
-        if(run.category===IDs.cat.level[player.category]){
-            totalleveltimes+=Number.parseFloat(run.times.primary_t);
-            continue;
-        };
-        if(run.category===IDs.cat.full[player.category]){
-            fullgametime=Number.parseFloat(run.times.primary_t);
-        }
+    for(let time in data.cats.level[player.category]){
+        totalleveltimes+=data.cats.level[player.category][time];
     }
     player.level=totalleveltimes.toFixed(2);
-    player.fullgame=fullgametime.toFixed(2);
-    player.total=(totalleveltimes*fullgametime).toFixed(2);
+    player.fullgame=data.cats.fullgame[player.category].toFixed(2);
+    player.total=(totalleveltimes*data.cats.fullgame[player.category]).toFixed(2);
 }
 
 function updateScores(){
-    getData(("https://www.speedrun.com/api/v1/games/"+IDs.karlson+"/records?miscellaneous=no&max=200&top=1"
-    ),data=>{
+    timeManager.getCommunityData(data=>{
         updateCommunityScores(data);
         updatePlayerScores();
         saveKarlsonScores();
@@ -220,4 +193,22 @@ function updateCommunityScores(data){
 
 function updatePlayerScores(){
 
+    // this completly ignores the possible timeout by the speedrun.com api
+
+    updatePlayerScoresList(karlsonScores.cats.any);
+    updatePlayerScoresList(karlsonScores.cats.ae);
+    updatePlayerScoresList(karlsonScores.cats.gunless);
+}
+
+function updatePlayerScoresList(playerlist,num=0){
+    if(num>playerlist.length)return;
+    let player = playerlist[num];
+    if(player==null)return;
+
+    timeManager.getPlayerData(player.name,data=>{
+        calculateScores(player,data);
+        updatePlayerScoresList(playerlist,num+1);
+    },error=>{
+        console.log(error);
+    });
 }
