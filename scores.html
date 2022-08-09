@@ -7,10 +7,12 @@
     <title>Karlson Score</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link rel="stylesheet" href="css/main.css">
+    <script src="/js/IDs.js" defer></script>
     <script src="/js/scores.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
+        <span  id="logo">KARLSON SCORE</span>
         <a href="/index.html">HOME</a>
         <a href="/scores.html" class="selected">SCORES</a>
         <a href="/compare.html">COMPARE</a>
@@ -18,7 +20,7 @@
 
     <main class="main">
      
-        <section class="section" style="width: 15rem;">
+        <section class="section" style="width: 18rem;">
 
             <div id="categoryselect">
                 <span onclick="selectCategory(this)" data-category="any">Any%</span>
@@ -31,8 +33,8 @@
                     <tr>
                         <th>Player</th>
                         <th>FullGame</th>
-                        <th>SoB</th>
-                        <th>Score</th>
+                        <th>Level</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody id="scoretable">
@@ -40,7 +42,7 @@
                 </tbody>
             </table>
     
-            <div>
+            <div class="flexrow">
                 <input type="text" id="addPlayerInput" autocomplete="off">
                 <button class="green" id="addPlayerBtn" onclick="addPlayer()">Add Player</button>
             </div>
