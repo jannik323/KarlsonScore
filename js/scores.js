@@ -176,6 +176,7 @@ function updateScores(){
         updateCommunityScores(data);
         updatePlayerScores();
         saveKarlsonScores();
+        updateTable();
         karlsonScores.nextUpdate=Date.now()+scoreTimeout;
     },error=>{
         console.log(error);
