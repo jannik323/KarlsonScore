@@ -64,7 +64,7 @@ function updateTable(){
 
     for(let player of karlsonScores.cats[karlsonScores.selcat]){
         let tr = document.createElement("tr");
-        let mx=0;
+        
 
         for(let i = 0;i<4;i++){
             let td = document.createElement("td");
@@ -88,6 +88,7 @@ function updateTable(){
 
         //delete function
         tr.addEventListener("mousedown",e=>{
+            let mx=0;
             addEventListener("mousemove",movePlayerEle);
             addEventListener("mouseup",()=>{
                 removeEventListener("mousemove",movePlayerEle);
@@ -102,7 +103,35 @@ function updateTable(){
             },{once:true})
 
             function movePlayerEle(e){
-                tr.style.transform="translateX("+(mx+=e.movementX)+"px)";
+                mx+=e.movementX
+                tr.style.transform="translateX("+(mx)+"px)";
+                tr.style.opacity=1/(Math.abs(mx)/50);
+            }
+        });
+
+        //delete mobile
+        tr.addEventListener("touchstart",e=>{
+            let lastmposx = null; 
+            let mx=0;
+            addEventListener("touchmove",movePlayerEle);
+            addEventListener("touchend",()=>{
+                removeEventListener("touchmove",movePlayerEle);
+                if(Math.abs(mx)>200){
+                    karlsonScores.removePlayer(player.name);
+                    updateTable();
+                }else{
+                    mx=0;
+                    tr.style.transform="translateX(0px)";
+                    tr.style.opacity=1;
+                }
+            },{once:true})
+
+            function movePlayerEle(e){
+                if(lastmposx==null)lastmposx=e.touches[0].clientX;
+                
+                mx+=e.touches[0].clientX-lastmposx;
+                lastmposx=e.touches[0].clientX;
+                tr.style.transform="translateX("+(mx)+"px)";
                 tr.style.opacity=1/(Math.abs(mx)/50);
             }
         });
