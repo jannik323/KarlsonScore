@@ -131,8 +131,10 @@ function updateTable(){
                 
                 mx+=e.touches[0].clientX-lastmposx;
                 lastmposx=e.touches[0].clientX;
-                tr.style.transform="translateX("+(mx)+"px)";
-                tr.style.opacity=1/(Math.abs(mx)/50);
+                if(Math.abs(mx)>10){
+                    tr.style.transform="translateX("+(mx)+"px)";
+                    tr.style.opacity=1/(Math.abs(mx)/50);
+                }
             }
         });
 
