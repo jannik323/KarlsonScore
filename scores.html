@@ -8,8 +8,9 @@
     <link rel="icon" type="image/x-icon" href="/KarlsonScore/images/favicon.ico">
     <link rel="stylesheet" href="/KarlsonScore/css/main.css">
     <script src="/KarlsonScore/js/IDs.js" defer></script>
-    <script src="/KarlsonScore/js/times.js" defer></script>
-    <script src="/KarlsonScore/js/scores.js" defer></script>
+    <script src="/KarlsonScore/js/timeObjects.js" defer></script>
+    <script src="/KarlsonScore/js/score/scoreObjects.js" defer></script>
+    <script src="/KarlsonScore/js/score/scorePage.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -21,35 +22,40 @@
 
     <main class="main">
      
-        <section class="section" style="width: 18rem;">
+        <div class="flexrow">
 
-            <div id="categoryselect">
-                <span onclick="selectCategory(this)" data-category="any">Any%</span>
-                <span onclick="selectCategory(this)" data-category="ae">All Enemies</span>
-                <span onclick="selectCategory(this)" data-category="gunless">Gunless</span>
-            </div>
-            
-            <table class="resulttable">
-                <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>FullGame</th>
-                        <th>Level</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="scoretable">
+            <section class="section" style="width: 18rem;">
 
-                </tbody>
-            </table>
+                <div id="categoryselect">
+                    <span onclick="selectCategory(this)" data-category="any">Any%</span>
+                    <span onclick="selectCategory(this)" data-category="ae">All Enemies</span>
+                    <span onclick="selectCategory(this)" data-category="gunless">Gunless</span>
+                </div>
     
-            <div class="flexrow">
-                <input type="text" id="addPlayerInput" autocomplete="off">
-                <button class="green" id="addPlayerBtn" onclick="addPlayer()">Add Player</button>
-                <button class="transparent nopadding" onclick="updateScores()"><img src="/KarlsonScore/images/Refresh.svg" width="35px" class="hoverspin"></button>
-            </div>
+                <table class="resulttable">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>FullGame</th>
+                            <th>Level</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoretable">
+    
+                    </tbody>
+                </table>
+        
+                <div class="flexrow">
+                    <input type="text" id="addPlayerInput" autocomplete="off">
+                    <button class="green" id="addPlayerBtn" onclick="addPlayer()">Add Player</button>
+                    <button class="transparent nopadding" onclick="updateScores()"><img src="/KarlsonScore/images/Refresh.svg" width="35px" class="hoverspin"></button>
+                </div>
+    
+            </section>
 
-        </section>
+        </div>
+       
         
 
         

@@ -6,6 +6,7 @@
 *{
     font-family: bluensia;
     box-sizing: content-box;
+    color:#ccc;
 }
 
 
@@ -96,6 +97,10 @@ table.resulttable thead tr{
     background-color: #333;
 }
 
+table.resulttable tr *::selection{
+    background-color: transparent;
+}
+
 table.resulttable tbody tr:hover{
     scale:1.05
 }
@@ -136,24 +141,36 @@ table.resulttable tbody tr:nth-child(odd) {
     background-color: #666;
 }
 
-/* buttons */
+/* color */
+
+.darkfont{
+    color:#333;
+}
 
 .green{
-    background-color: rgb(77, 131, 78);
+    background-color: #4d834e;
 }
 
 .red{
-    background-color: rgb(131, 77, 77);
+    background-color: #834d4d;
 }
 
 .transparent{
-    background-color: rgba(255, 255, 255, 0);
+    background-color: #ffffff00;
 }
+
+.grey{
+    background-color: #8d8d8d;
+}
+
+/* buttons */
+
+
 
 button{
     border: none;
     padding: 0.5rem;
-    background-color: rgb(134, 134, 134);
+    background-color: #868686;
     color:#ccc;
     width: max-content;
     cursor: pointer;
@@ -169,11 +186,12 @@ button:disabled{
 
 /* input text */
 
-input[type=text]{
+input[type=text],input[type=number]{
     border:none;
     height: 1.8rem;
     width: 8rem;
     outline: none;
+    color: #333;
 }
 
 /* misc */
@@ -203,9 +221,36 @@ input[type=text]{
     padding:0px;
 }
 
+.paddingsmall{
+    padding:1rem;
+}
+
+.rounded{
+    border-radius: .5rem;
+}
+
+.flexend{
+    justify-content: end;
+}
+
+
+
 /* animation */
 
 @keyframes fade-in {
     from {opacity:0}
     to {opacity:1;}
+}
+
+/* options */
+/* settings */
+
+.option{
+    margin: 0.5rem 0rem;
+    background-color: #666;
+    padding: 0.5rem;
+}
+
+.option>*{
+    margin: 0.5rem 0rem;
 }

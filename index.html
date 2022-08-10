@@ -7,6 +7,9 @@
     <title>Karlson Score</title>
     <link rel="icon" type="image/x-icon" href="/KarlsonScore/images/favicon.ico">
     <link rel="stylesheet" href="/KarlsonScore/css/main.css">
+    <script src="/KarlsonScore/js/score/scoreObjects.js" defer></script>
+    <script src="/KarlsonScore/js/options.js" defer></script>
+    <script src="/KarlsonScore/js/misc/snake.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -18,8 +21,42 @@
     </nav>
 
     <main class="main">
-     
+        <div class="flexrow flexend">
 
+            <section class="section" style=" margin:auto">
+                
+                <h1 class="darkfont">COMING SOON</h1>
+            
+            </section>
+ 
+            <section class="section" style="width: 18rem;">
+                
+                <div class="grey paddingsmall" style="height: 30rem;">
+                        
+                    <h1 class="darkfont">Options</h1>
+
+                    
+                    <div class="option">
+                        <label for="refresh">Score Refresh Time (minutes) </label>
+                        <input type="number" name="refresh" id="refresh" placeholder="time in minutes" oninput="checkinput(this)" onchange="changeRefreshTime(this)" >
+                    </div>
+                    <div class="option">
+                        <label for="delete">Delete All Data</label>
+                        <button id="delete" class="red" onclick="deleteAllData()">DELETE</button>
+                    </div>
+                    <div class="option">
+                        <label for="test">test bla bla test</label>
+                        <input type="checkbox"  name="test" id="test" onload="this.checked=false" onchange="if(this.checked){document.getElementById('snake').style.display='block'}else{document.getElementById('snake').style.display='none'}" >
+                    </div>
+                    <div class="option" id="snake" style="display:none;">
+                        <label >snake</label>
+                        <button class="green" onclick="Snake()" >SNAKE</button>
+                    </div>
+
+                </div>
+            
+            </section>
+        </div>
 
         
 
