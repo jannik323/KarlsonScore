@@ -28,6 +28,12 @@ class KarlsonScores{
     }
 
     #copy(karlsonScores){
+        if(karlsonScores.version!=this.version){
+            if(confirm("Your local data format is outdated. Right now you can only reset it to the default to fix this. Do you want to proceed with that? (Otherwise Errors might arise)")){
+                localStorage.setItem("karlsonScores",JSON.stringify(this));
+                return;
+            }
+        }
         this.version=karlsonScores.version;
         this.selcat=karlsonScores.selcat,
         this.cats=karlsonScores.cats
