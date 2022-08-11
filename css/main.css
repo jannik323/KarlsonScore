@@ -13,6 +13,7 @@
 body,html{
     margin: 0px;
     background-color: #ccc;
+    overflow-x: hidden;
 }
 
 /* logo */
@@ -77,6 +78,9 @@ section.section{
     opacity: 1;
     animation-name: fade-in;
     animation-duration: 1s;
+    min-width: 18rem;
+    max-width: 25rem;
+    width: 80%;
 }
 
 /* resulttable */
@@ -85,6 +89,7 @@ table.resulttable {
     border-collapse: collapse;
     cursor: default;
     color:#ccc;
+    min-width: 18rem;
 }
 
 table.resulttable td, table.resulttable th{
@@ -99,6 +104,13 @@ table.resulttable thead tr{
 table.resulttable tr *::selection{
     background-color: transparent;
 }
+
+table.resulttable tr td:first-child{
+    max-width: 3rem;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
 
 table.resulttable tbody tr:hover{
     scale:1.05
