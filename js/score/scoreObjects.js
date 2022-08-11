@@ -160,7 +160,6 @@ class KarlsonScores{
     #calculateScores(player,data,community=timeManager.getCurrentCommunityData()){
         let levelcount = 0;
         let totalleveltimes = 0;
-        let missingLevelPenalty = 1.2;
         let missingLevelTime = 0;
         for(let level in data.cats.level[player.category]){
             let leveltime = data.cats.level[player.category][level];
@@ -173,37 +172,26 @@ class KarlsonScores{
         }
 
         // level score
-        let comSob = karlsonScores.community[player.category].level;
-        if(levelcount==11){
-            //if the player has times in all levels -> everything good -> me happy
-            player.level=((comSob/totalleveltimes)*100).toFixed(2);
-        }else if(levelcount!=0){
-            // if a player doesnt have a time for all the levels
-            while(comSob<(missingLevelTime*missingLevelPenalty)){
-                missingLevelPenalty*=0.999;
-                //if the level score goes negative because of missingLevelPenalty
-            }
-            player.level =(((comSob-(missingLevelTime*missingLevelPenalty))/totalleveltimes)*100).toFixed(2);
+        if(levelcount!=0){
+            player.level =((((this.community[player.category].level-missingLevelTime)/totalleveltimes)*Math.sqrt((levelcount)/11))*100).toFixed(2);
         }else{
-            player.level=null;
+            player.level=0;
         }
         
         // fullgame score
         if(data.cats.fullgame[player.category]!=-1){
-            player.fullgame=((karlsonScores.community[player.category].fullgame/data.cats.fullgame[player.category])*100).toFixed(2);
+            player.fullgame=((this.community[player.category].fullgame/data.cats.fullgame[player.category])*100).toFixed(2);
         }else{
-            player.fullgame=null;
+            player.fullgame=0;
         }
     
         //total score
-        if(levelcount==11&&data.cats.fullgame[player.category]!=-1){
-            player.total=(((karlsonScores.community[player.category].total)/(data.cats.fullgame[player.category]*totalleveltimes))*100).toFixed(2);
-        }else{
-            player.total=null;
-        }
+        player.total=(((player.fullgame*1)+(player.level*1))/2).toFixed(2);
     
     }
     
+    // not rly the scores.... just the sob and fullgame time lol
+    // this could honestly be removed at this point
     #calculateCommunityScores(player,data){
     
         let totalleveltimes = 0;

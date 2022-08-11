@@ -10,7 +10,7 @@ function deleteAllData(){
 }
 
 function changeRefreshTime(self){
-   karlsonScores.updateTime=self.value*60000;
+   karlsonScores.updateTime=Math.round(self.value*60000);
    karlsonScores.saveKarlsonScores();
 }
 

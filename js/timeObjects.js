@@ -35,8 +35,8 @@ class TimeHolder{
 
 class TimeManager{
     #times;
-    timeout=60000; 
-    // if a TimeHolder was last updated 1 min ago a update is not needed;
+    timeout=60000*5; 
+    // if a TimeHolder was last updated 5 min ago a update is not needed;
     constructor(){
         this.#checkLocalStorage();
     }
