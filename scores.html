@@ -26,13 +26,13 @@
 
             <section class="section" style="width: 18rem;">
 
-                <div id="categoryselect">
+                <div id="categoryselect" class="marginsmall">
                     <span onclick="selectCategory(this)" data-category="any">Any%</span>
                     <span onclick="selectCategory(this)" data-category="ae">All Enemies</span>
                     <span onclick="selectCategory(this)" data-category="gunless">Gunless</span>
                 </div>
     
-                <table class="resulttable">
+                <table class="resulttable marginsmall">
                     <thead>
                         <tr>
                             <th>Player</th>
@@ -46,10 +46,19 @@
                     </tbody>
                 </table>
         
-                <div class="flexrow">
-                    <input type="text" id="addPlayerInput" autocomplete="off">
-                    <button class="green" id="addPlayerBtn" onclick="addPlayer()">Add Player</button>
+                <div class="flexrow marginsmall">
+                    <input type="text" id="addPlayerInput" placeholder="Player Name" autocomplete="off">
+                    <button class="green" id="addPlayerBtn" onclick="addPlayer(this)">Add Player</button>
                     <button class="transparent nopadding" onclick="updateScores()"><img src="/KarlsonScore/images/Refresh.svg" width="35px" class="hoverspin"></button>
+                </div>
+
+                <div class="flexrow marginsmall">
+                    <input type="number" id="addTopPlayersInput" placeholder="Top Places"  autocomplete="off">
+                    <button class="blue" id="addTopPlayersBtn" onclick="addTopPlayers(this)">Add Top Players</button>
+                </div>
+
+                <div class="flexrow marginsmall" >
+                    <progress id="progress" value="0.0" style="display: none;"></progress>
                 </div>
     
             </section>

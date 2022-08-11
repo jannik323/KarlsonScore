@@ -82,7 +82,6 @@ section.section{
 /* resulttable */
 
 table.resulttable {
-    margin: 1rem 0rem;
     border-collapse: collapse;
     cursor: default;
     color:#ccc;
@@ -155,6 +154,10 @@ table.resulttable tbody tr:nth-child(odd) {
     background-color: #834d4d;
 }
 
+.blue{
+    background-color: #4d6283;
+}
+
 .transparent{
     background-color: #ffffff00;
 }
@@ -181,10 +184,12 @@ button:hover{
 }
 
 button:disabled{
-    filter:opacity(0.5)
+    filter:opacity(0.5);
+    cursor:not-allowed;
+
 }
 
-/* input text */
+/* input  */
 
 input[type=text],input[type=number]{
     border:none;
@@ -192,6 +197,18 @@ input[type=text],input[type=number]{
     width: 8rem;
     outline: none;
     color: #333;
+}
+
+/* progress */
+
+progress{
+    border: none;
+    height: 1.25rem;
+    width: 15rem;
+}
+
+progress::-moz-progress-bar,progress::-webkit-progress-value{
+    background: green;
 }
 
 /* misc */
@@ -225,6 +242,10 @@ input[type=text],input[type=number]{
     padding:1rem;
 }
 
+.marginsmall{
+    margin: 0.5rem 0rem;
+}
+
 .rounded{
     border-radius: .5rem;
 }
@@ -254,3 +275,4 @@ input[type=text],input[type=number]{
 .option>*{
     margin: 0.5rem 0rem;
 }
+

@@ -69,6 +69,10 @@ class TimeManager{
         }
     }
 
+    getCurrentCommunityData(){
+        return this.#times.communitytime;
+    }
+
     #checkLocalStorage(){
         let times_temp = localStorage.getItem("karlsonTimes");
         if(times_temp==null){
@@ -112,9 +116,23 @@ class TimeManager{
                 if(run.category===IDs.findId.cat.level.ae&&run.level===IDs.findId.lvl.sand2)continue;
                 //
                 if(run.level==null){
-                    timeHolder.cats.fullgame[IDs.findName.cat.full[run.category]]=run.times.primary_t;
+                    let catName = IDs.findName.cat.full[run.category];
+                    if(catName==null)continue;
+                    timeHolder.cats.fullgame[catName]=run.times.primary_t;
                 }else{
-                    timeHolder.cats.level[IDs.findName.cat.level[run.category]][IDs.findName.lvl[run.level]]=run.times.primary_t;
+                    let levelCatName = IDs.findName.cat.level[run.category];
+                    let levelName = IDs.findName.lvl[run.level];
+                    if(levelCatName==null||levelName==null)continue;
+                    timeHolder.cats.level[levelCatName][levelName]=run.times.primary_t;
+                }
+            }
+
+            for(let name in timeHolder.cats.fullgame){
+                timeHolder.cats.fullgame[name]=timeHolder.cats.fullgame[name]??-1;
+            }
+            for(let name in timeHolder.cats.level){
+                for(let levelname in timeHolder.cats.level[name]){
+                    timeHolder.cats.level[name][levelname]=timeHolder.cats.level[name][levelname]??-1;
                 }
             }
 

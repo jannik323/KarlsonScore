@@ -25,22 +25,54 @@ function selectCategory(self){
 
 //input box enter to click btn
 document.getElementById("addPlayerInput").addEventListener("keydown",e=>{
+    e.target.value=e.target.value.trim();
+    if(e.target.value=="")return;
     if(e.key==="Enter")document.getElementById("addPlayerBtn").click();
 });
 
-function addPlayer(){
-    let addPlayerInput = document.getElementById("addPlayerInput");
-    let addPlayerBtn = document.getElementById("addPlayerBtn");
-    addPlayerInput.value=addPlayerInput.value.trim();
-    if(addPlayerInput.value=="")return;
-    
-    addPlayerBtn.disabled=true;
-    karlsonScores.addPlayer(new Player(addPlayerInput.value,karlsonScores.selcat)
-    ,()=>{
+document.getElementById("addTopPlayersBtn").disabled=true;
+document.getElementById("addTopPlayersInput").value="";
+document.getElementById("addTopPlayersInput").oninput=e=>{
+    let btn = document.getElementById("addTopPlayersBtn");
+    if(e.target.value<1){
+        e.target.value="";
+        btn.disabled=true;
+    }else if(e.target.value>50){
+        e.target.value=50;
+    }else{
+        btn.disabled=false;
+    }
+}
+function addTopPlayers(self){
+    let addTopPlayersInput = document.getElementById("addTopPlayersInput");
+    let progress = document.getElementById("progress");
+    progress.max=addTopPlayersInput.value;
+    progress.style.display="block";
+    let counter = new Counter(()=>{
+        progress.value=counter.count;
+    });
+    self.disabled=true;
+    karlsonScores.addTopPlayers(addTopPlayersInput.value,()=>{
+        self.disabled=false;
+        progress.style.display="none";
         updateTable();
-        addPlayerBtn.disabled=false;
     },error=>{
-        addPlayerBtn.disabled=false;
+        self.disabled=false;
+        progress.style.display="none";
+        console.error(error);
+    },{category:karlsonScores.selcat,counter:counter});
+}
+
+
+function addPlayer(self){
+    let addPlayerInput = document.getElementById("addPlayerInput");
+    
+    self.disabled=true;
+    karlsonScores.addPlayer(addPlayerInput.value,()=>{
+        self.disabled=false;
+        updateTable();
+    },error=>{
+        self.disabled=false;
         console.error(error);
     });
 

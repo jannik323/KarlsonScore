@@ -8,6 +8,18 @@ class Player{
     }
 }
 
+class Counter{
+    count=0;
+    counted;
+    constructor(counted){
+        this.counted=counted;
+    }
+    countUp(){
+        this.count++;
+        this.counted();
+    }
+}
+
 class KarlsonScores{
     constructor(){
         this.version=1.1;
@@ -17,8 +29,8 @@ class KarlsonScores{
             ae:[],
             gunless:[],
         };
-        this.nextUpdate=Date.now();
-        this.updateTime=3600000;
+        this.nextUpdate=0;
+        this.updateTime=3600000*6;
         this.community={
             any:new Player("community","any"),
             ae:new Player("community","ae"),
@@ -52,7 +64,7 @@ class KarlsonScores{
     }
 
     startUpdateCheck(callback){
-        callback();
+        this.#updateCheck(callback)
         setInterval(()=>this.#updateCheck(callback),1000);
     }
 
@@ -79,11 +91,12 @@ class KarlsonScores{
         return false
     }
 
-    addPlayer(player,callback,error){
-        if(this.hasPlayer(player.name)){
+    addPlayer(playerName,callback,error,options={category:this.selcat}){
+        if(this.hasPlayer(playerName)){
             error("player already there");
             return;
         };
+        let player = new Player(playerName,options.category);
         timeManager.getPlayerData(player.name,data=>{
             this.cats[player.category].push(player);
             this.#calculateScores(player,data);
@@ -92,6 +105,45 @@ class KarlsonScores{
         },err=>{
             error(err);
         });
+    }
+
+    addPlayerList(playerList,callback=null,options={category:this.selcat,counter:null},num=0){
+        if(num>=playerList.length){
+            if(callback!=null)callback();
+            return;
+        }
+        let player = playerList[num];
+        if(player==null){
+            if(callback!=null)callback();
+            return;
+        }
+        this.addPlayer(player,()=>{
+            this.addPlayerList(playerList,callback,options,num+1);
+            if(options.counter!=null){
+                options.counter.countUp();
+            }
+        },error=>{
+            console.error(error);
+            this.addPlayerList(playerList,callback,options,num+1);
+            if(options.counter!=null){
+                options.counter.countUp();
+            }
+        });
+    }
+
+    addTopPlayers(top,callback,error,options={category:this.selcat,counter:null}){
+
+        fetch("https://www.speedrun.com/api/v1/leaderboards/"+IDs.karlson+"/category/"+IDs.findId.cat.full[options.category]+"?top="+top+"&embed=players").then(response=>{
+            if (!response.ok) {
+                error(response.status);
+                throw new Error("Request failed with status "+response.status);
+            }
+            return response.json();
+        })
+        .then(data=>{
+            this.addPlayerList(data.data.players.data.map(e=>e.names.international),callback,{category:options.category,counter:options.counter});
+        })
+        .catch(errordata=>error(errordata));
     }
 
     removePlayer(playerName,selcat=this.selcat){
@@ -105,27 +157,49 @@ class KarlsonScores{
         return true;
     }
 
-    #calculateScores(player,data){
+    #calculateScores(player,data,community=timeManager.getCurrentCommunityData()){
         let levelcount = 0;
         let totalleveltimes = 0;
-        for(let time in data.cats.level[player.category]){
-            let leveltime = data.cats.level[player.category][time];
-            if(leveltime==null)continue;
-            levelcount++;
-            totalleveltimes+=leveltime;
+        let missingLevelPenalty = 1.2;
+        let missingLevelTime = 0;
+        for(let level in data.cats.level[player.category]){
+            let leveltime = data.cats.level[player.category][level];
+            if(leveltime==-1){
+                missingLevelTime+=community.cats.level[player.category][level];
+            }else{
+                levelcount++;
+                totalleveltimes+=leveltime;
+            };
         }
+
+        // level score
+        let comSob = karlsonScores.community[player.category].level;
         if(levelcount==11){
-            player.level=((karlsonScores.community[player.category].level/totalleveltimes)*100).toFixed(2);
+            //if the player has times in all levels -> everything good -> me happy
+            player.level=((comSob/totalleveltimes)*100).toFixed(2);
+        }else if(levelcount!=0){
+            // if a player doesnt have a time for all the levels
+            while(comSob<(missingLevelTime*missingLevelPenalty)){
+                missingLevelPenalty*=0.999;
+                //if the level score goes negative because of missingLevelPenalty
+            }
+            player.level =(((comSob-(missingLevelTime*missingLevelPenalty))/totalleveltimes)*100).toFixed(2);
         }else{
-            totalleveltimes=null;
+            player.level=null;
         }
         
-        if(data.cats.fullgame[player.category]!=null){
+        // fullgame score
+        if(data.cats.fullgame[player.category]!=-1){
             player.fullgame=((karlsonScores.community[player.category].fullgame/data.cats.fullgame[player.category])*100).toFixed(2);
+        }else{
+            player.fullgame=null;
         }
     
-        if(levelcount==11&&data.cats.fullgame[player.category]!=null){
-            player.total=((karlsonScores.community[player.category].total/(data.cats.fullgame[player.category]*totalleveltimes))*100).toFixed(2);
+        //total score
+        if(levelcount==11&&data.cats.fullgame[player.category]!=-1){
+            player.total=(((karlsonScores.community[player.category].total)/(data.cats.fullgame[player.category]*totalleveltimes))*100).toFixed(2);
+        }else{
+            player.total=null;
         }
     
     }
@@ -141,16 +215,22 @@ class KarlsonScores{
         player.total=(totalleveltimes*data.cats.fullgame[player.category]).toFixed(2);
     }
     
-    #updatePlayerScoresList(playerlist,num=0){
-        if(num>playerlist.length)return;
-        let player = playerlist[num];
-        if(player==null)return;
-    
+    #updatePlayerScoresList(community,playerList,callback=null,num=0){
+        if(num>=playerList.length){
+            if(callback!=null)callback();
+            return;
+        }
+        let player = playerList[num];
+        if(player==null){
+            if(callback!=null)callback();
+            return;
+        }
         timeManager.getPlayerData(player.name,data=>{
-            this.#calculateScores(player,data);
-            this.#updatePlayerScoresList(playerlist,num+1);
+            this.#calculateScores(player,data,community);
+            this.#updatePlayerScoresList(community,playerList,callback,num+1);
         },error=>{
             console.log(error);
+            if(callback!=null)callback();
         });
     }
 
@@ -163,15 +243,21 @@ class KarlsonScores{
             this.#calculateCommunityScores(karlsonScores.community.ae,data);
             this.#calculateCommunityScores(karlsonScores.community.gunless,data);
             //players
-            this.#updatePlayerScoresList(karlsonScores.cats.any);
-            this.#updatePlayerScoresList(karlsonScores.cats.ae);
-            this.#updatePlayerScoresList(karlsonScores.cats.gunless);
-
-            this.saveKarlsonScores();
-            this.nextUpdate=Date.now();
-            callback();
+            this.#updatePlayerScoresList(data,karlsonScores.cats.any,
+                ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.ae,
+                    ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.gunless,
+                        ()=>{
+                            this.saveKarlsonScores();
+                            this.nextUpdate=Date.now();
+                            callback();
+                        }
+            )));
         },err=>{
             error(err);
         });
+    }
+
+    getLocalStorageSize(){
+        return (((localStorage.karlsonScores.length + localStorage.karlsonScores.length) * 2) / 1024).toFixed(2) + " KB";
     }
 }
