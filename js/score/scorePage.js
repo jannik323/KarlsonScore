@@ -1,5 +1,5 @@
 let karlsonScores = new KarlsonScores();
-let timeManager = new TimeManager();
+let karlsonTimes = new KarlsonTimes();
 
 karlsonScores.startUpdateCheck(updateScores);
 
@@ -104,6 +104,7 @@ function updateTable(){
             switch(i){
                 case 0:
                     td.innerText=player.name;
+                    td.title=player.name;
                     break;
                 case 1:
                     td.innerText=player.fullgame??"-";

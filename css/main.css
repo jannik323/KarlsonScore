@@ -111,6 +111,10 @@ table.resulttable tr td:first-child{
     text-overflow: ellipsis;
 }
 
+table.resulttable tr td:hover{
+    background-color: rgba(34, 34, 34, 0.4);
+}
+
 
 table.resulttable tbody tr:hover{
     scale:1.05

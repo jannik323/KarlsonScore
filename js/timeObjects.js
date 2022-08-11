@@ -33,17 +33,58 @@ class TimeHolder{
     }
 }
 
-class TimeManager{
-    #times;
-    timeout=60000*5; 
+class KarlsonTimes{
     // if a TimeHolder was last updated 5 min ago a update is not needed;
+    #timeout=60000*5; 
+
     constructor(){
+        this.version=1;
+        this.list=[];
+        this.communitytime=new TimeHolder("community");
         this.#checkLocalStorage();
+    }
+
+    #copy(karlsonTimes){
+        if(karlsonTimes.version!=this.version){
+            this.#fixLocalStorage(karlsonTimes);
+        }
+        this.list=karlsonTimes.list;
+        this.communitytime=karlsonTimes.communitytime;
+    }
+
+    #fixLocalStorage(karlsonTimes= localStorage.getItem("karlsonTimes")){
+
+        for (let p in this) {
+            // missing property that the parameter karlsonTimes object doesnt have
+            karlsonTimes[p] = karlsonTimes[p]??this[p]; 
+        }
+        for (let p in karlsonTimes) {
+            // property in the parameter karlsonTimes has a different name now or was removed
+            if(this[p]==undefined){
+                delete karlsonTimes[p];
+            }
+        }
+
+        karlsonTimes.version=this.version;
+        localStorage.setItem("karlsonTimes",JSON.stringify(karlsonTimes));
+    }
+
+    #checkLocalStorage(){
+        let times_temp = localStorage.getItem("karlsonTimes");
+        if(times_temp==null){
+            localStorage.setItem("karlsonTimes",JSON.stringify(this));
+        }else{
+            this.#copy(JSON.parse(times_temp));
+        }
+    }
+
+    saveKarlsonTimes(){
+        localStorage.setItem("karlsonTimes",JSON.stringify(this));
     }
 
     getPlayerData(PlayerName,callback,error,instant=false){
         let TimeHolder = this.#getTimeHolder(PlayerName);
-        if(instant||Date.now()>TimeHolder.lastUpdateTime+this.timeout){
+        if(instant||Date.now()>TimeHolder.lastUpdateTime+this.#timeout){
             this.#fetchPlayerData(TimeHolder,data=>{
                 TimeHolder.lastUpdateTime=Date.now();
                 callback(data);
@@ -56,8 +97,8 @@ class TimeManager{
     }
 
     getCommunityData(call,error,instant=false){
-        let TimeHolder = this.#times.communitytime;
-        if(instant||Date.now()>TimeHolder.lastUpdateTime+this.timeout){
+        let TimeHolder = this.communitytime;
+        if(instant||Date.now()>TimeHolder.lastUpdateTime+this.#timeout){
             this.#fetchCommunityData(data=>{
                 TimeHolder.lastUpdateTime=Date.now();
                 call(data);
@@ -70,29 +111,16 @@ class TimeManager{
     }
 
     getCurrentCommunityData(){
-        return this.#times.communitytime;
+        return this.communitytime;
     }
 
-    #checkLocalStorage(){
-        let times_temp = localStorage.getItem("karlsonTimes");
-        if(times_temp==null){
-            times_temp = {
-                version:1,
-                list:[],
-                communitytime:new TimeHolder("community"),
-            };
-            this.#times=times_temp;
-            localStorage.setItem("karlsonTimes",JSON.stringify(this.#times));
-        }else{
-            this.#times=JSON.parse(times_temp);
-        }
-    }
+    
 
     #getTimeHolder(PlayerName){
-        let timeHolder = this.#times.list.find(t=>t.name===PlayerName);
+        let timeHolder = this.list.find(t=>t.name===PlayerName);
         if(timeHolder==null){
             timeHolder = new TimeHolder(PlayerName); 
-            this.#times.list.push(timeHolder);
+            this.list.push(timeHolder);
         }
         return timeHolder;
     }
@@ -136,7 +164,7 @@ class TimeManager{
                 }
             }
 
-            localStorage.setItem("karlsonTimes",JSON.stringify(this.#times));
+            this.saveKarlsonTimes();
 
             callback(timeHolder);
         })
@@ -158,27 +186,31 @@ class TimeManager{
                 let run = rundata.runs[0].run;
                 // sandbox2 all enemies quickfix
                 if(run.category===IDs.findId.cat.level.any&&run.level===IDs.findId.lvl.sand2){
-                    this.#times.communitytime.cats.level.ae.sand2=run.times.primary_t;
+                    this.communitytime.cats.level.ae.sand2=run.times.primary_t;
                 }
                 if(run.category===IDs.findId.cat.level.ae&&run.level===IDs.findId.lvl.sand2)continue;
                 //
                 if(run.level==null){
                     let catName = IDs.findName.cat.full[run.category];
                     if(catName==null)continue;
-                    this.#times.communitytime.cats.fullgame[catName]=run.times.primary_t;
+                    this.communitytime.cats.fullgame[catName]=run.times.primary_t;
                 }else{
                     let levelCatName = IDs.findName.cat.level[run.category];
                     let levelName = IDs.findName.lvl[run.level];
                     if(levelCatName==null||levelName==null)continue;
-                    this.#times.communitytime.cats.level[levelCatName][levelName]=run.times.primary_t;
+                    this.communitytime.cats.level[levelCatName][levelName]=run.times.primary_t;
                 }
             }
 
-            localStorage.setItem("karlsonTimes",JSON.stringify(this.#times));
+            this.saveKarlsonTimes();
 
-            callback(this.#times.communitytime);
+            callback(this.communitytime);
         })
         .catch(errordata=>error(errordata));
+    }
+
+    getLocalStorageSize(){
+        return (((localStorage.karlsonTimes.length + localStorage.karlsonTimes.length) * 2) / 1024).toFixed(2) + " KB";
     }
 
 }

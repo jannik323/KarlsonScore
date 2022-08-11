@@ -21,8 +21,9 @@ class Counter{
 }
 
 class KarlsonScores{
+
     constructor(){
-        this.version=1.1;
+        this.version=1.2;
         this.selcat="any",
         this.cats={
             any:[],
@@ -31,36 +32,49 @@ class KarlsonScores{
         };
         this.nextUpdate=0;
         this.updateTime=3600000*6;
-        this.community={
-            any:new Player("community","any"),
-            ae:new Player("community","ae"),
-            gunless:new Player("community","gunless"),
-        }
         this.#checkLocalStorage();
     }
 
     #copy(karlsonScores){
+
         if(karlsonScores.version!=this.version){
-            if(confirm("Your local data format is outdated. Right now you can only reset it to the default to fix this. Do you want to proceed with that? (Otherwise Errors might arise)")){
-                localStorage.setItem("karlsonScores",JSON.stringify(this));
-                return;
-            }
+            this.#fixLocalStorage(karlsonScores);
         }
-        this.version=karlsonScores.version;
+
         this.selcat=karlsonScores.selcat,
         this.cats=karlsonScores.cats
         this.nextUpdate=karlsonScores.nextUpdate;
         this.updateTime=karlsonScores.updateTime;
-        this.community=karlsonScores.community;
     }
 
     #checkLocalStorage(){
-        let scores_temp = localStorage.getItem("karlsonScores");
-        if(scores_temp==null){
+        let karlsonScores = localStorage.getItem("karlsonScores");
+        if(karlsonScores==null){
             localStorage.setItem("karlsonScores",JSON.stringify(this));
         }else{
-            this.#copy(JSON.parse(scores_temp));
+            this.#copy(JSON.parse(karlsonScores));
         }
+    }
+
+    #fixLocalStorage(karlsonScores= localStorage.getItem("karlsonScores")){
+
+        for (let p in this) {
+            // missing property that the parameter karlsonScores object doesnt have
+            karlsonScores[p] = karlsonScores[p]??this[p]; 
+        }
+        for (let p in karlsonScores) {
+            // property in the parameter karlsonScores has a different name now or was removed
+            if(this[p]==undefined){
+                delete karlsonScores[p];
+            }
+        }
+
+        karlsonScores.version=this.version;
+        localStorage.setItem("karlsonScores",JSON.stringify(karlsonScores));
+    }
+
+    saveKarlsonScores(){
+        localStorage.setItem("karlsonScores",JSON.stringify(this));
     }
 
     startUpdateCheck(callback){
@@ -78,17 +92,13 @@ class KarlsonScores{
         this.saveKarlsonScores();
     }
 
-    saveKarlsonScores(){
-        localStorage.setItem("karlsonScores",JSON.stringify(this));
-    }
-
     hasPlayer(playerName){
         for(let player of this.cats[this.selcat]){
             if(player.name===playerName){
                 return true;
             };
         }
-        return false
+        return false;
     }
 
     addPlayer(playerName,callback,error,options={category:this.selcat}){
@@ -97,7 +107,7 @@ class KarlsonScores{
             return;
         };
         let player = new Player(playerName,options.category);
-        timeManager.getPlayerData(player.name,data=>{
+        karlsonTimes.getPlayerData(player.name,data=>{
             this.cats[player.category].push(player);
             this.#calculateScores(player,data);
             this.saveKarlsonScores();
@@ -157,30 +167,29 @@ class KarlsonScores{
         return true;
     }
 
-    #calculateScores(player,data,community=timeManager.getCurrentCommunityData()){
+    #calculateScores(player,data,community=karlsonTimes.getCurrentCommunityData()){
         let levelcount = 0;
-        let totalleveltimes = 0;
-        let missingLevelTime = 0;
+        let SoB = 0;
+        let comSoB = 0;
         for(let level in data.cats.level[player.category]){
             let leveltime = data.cats.level[player.category][level];
-            if(leveltime==-1){
-                missingLevelTime+=community.cats.level[player.category][level];
-            }else{
+            if(leveltime!=-1){
                 levelcount++;
-                totalleveltimes+=leveltime;
+                SoB+=leveltime;
+                comSoB+=community.cats.level[player.category][level];
             };
         }
 
         // level score
         if(levelcount!=0){
-            player.level =((((this.community[player.category].level-missingLevelTime)/totalleveltimes)*Math.sqrt((levelcount)/11))*100).toFixed(2);
+            player.level =(((comSoB/SoB)*Math.sqrt((levelcount)/11))*100).toFixed(2);
         }else{
             player.level=0;
         }
         
         // fullgame score
         if(data.cats.fullgame[player.category]!=-1){
-            player.fullgame=((this.community[player.category].fullgame/data.cats.fullgame[player.category])*100).toFixed(2);
+            player.fullgame=((community.cats.fullgame[player.category]/data.cats.fullgame[player.category])*100).toFixed(2);
         }else{
             player.fullgame=0;
         }
@@ -213,7 +222,7 @@ class KarlsonScores{
             if(callback!=null)callback();
             return;
         }
-        timeManager.getPlayerData(player.name,data=>{
+        karlsonTimes.getPlayerData(player.name,data=>{
             this.#calculateScores(player,data,community);
             this.#updatePlayerScoresList(community,playerList,callback,num+1);
         },error=>{
@@ -223,14 +232,9 @@ class KarlsonScores{
     }
 
     updateScores(callback,error){
-        timeManager.getCommunityData(data=>{
+        karlsonTimes.getCommunityData(data=>{
             // this completly ignores the possible timeout by the speedrun.com api
-            
-            //community
-            this.#calculateCommunityScores(karlsonScores.community.any,data);
-            this.#calculateCommunityScores(karlsonScores.community.ae,data);
-            this.#calculateCommunityScores(karlsonScores.community.gunless,data);
-            //players
+
             this.#updatePlayerScoresList(data,karlsonScores.cats.any,
                 ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.ae,
                     ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.gunless,
