@@ -118,7 +118,6 @@ table.resulttable tr th:hover{
 
 table.resulttable tr td:hover{
     background-color: rgba(34, 34, 34, 0.4);
-    cursor:alias;
 }
 
 
@@ -135,6 +134,11 @@ table.resulttable tbody tr {
 
 table.resulttable tbody tr:nth-child(odd) {
     background-color: #555;
+}
+
+table.resulttable tbody a[href] {
+    text-decoration: none;
+    cursor:alias;
 }
 
 span.sorter{

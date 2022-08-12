@@ -233,7 +233,7 @@ class KarlsonScores{
     }
 
     
-    #updatePlayerScoresList(community,playerList,callback=null,num=0){
+    #updatePlayerScoresList(community,playerList,callback=null,counter=null,num=0){
         if(num>=playerList.length){
             if(callback!=null)callback();
             return;
@@ -244,30 +244,31 @@ class KarlsonScores{
             return;
         }
         karlsonTimes.getPlayerData(player.name,data=>{
+            if(counter!=null){
+                counter.countUp();
+            }
             this.#calculateScores(player,data,community);
-            this.#updatePlayerScoresList(community,playerList,callback,num+1);
+            this.#updatePlayerScoresList(community,playerList,callback,counter,num+1);
         },error=>{
             console.log(error);
             if(callback!=null)callback();
         });
     }
 
-    updateScores(callback,error){
+    updateScores(callback,error,counter=null){
         karlsonTimes.getCommunityData(data=>{
-
             
-
             // this completly ignores the possible timeout by the speedrun.com api
 
-            this.#updatePlayerScoresList(data,karlsonScores.cats.any,
-                ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.ae,
-                    ()=>this.#updatePlayerScoresList(data,karlsonScores.cats.gunless,
+            this.#updatePlayerScoresList(data,this.cats.any,
+                ()=>this.#updatePlayerScoresList(data,this.cats.ae,
+                    ()=>this.#updatePlayerScoresList(data,this.cats.gunless,
                         ()=>{
                             this.saveKarlsonScores();
                             this.nextUpdate=Date.now();
                             callback();
                         }
-            )));
+            ,counter),counter),counter);
         },err=>{
             error(err);
         });

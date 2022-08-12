@@ -80,12 +80,32 @@ function addPlayer(self){
     addPlayerInput.value="";
 }
 
-function updateScores(){
+function updateScores(self=null){
+    let progress = document.getElementById("progress");
+    progress.max=karlsonScores.cats.any.length+karlsonScores.cats.ae.length+karlsonScores.cats.gunless.length;
+    progress.style.display="block";
+    progress.value=0;
+    let counter = new Counter(()=>{
+        progress.value=counter.count;
+    });
+
+    if(self!=null){
+        self.disabled=true;
+    }
+
     karlsonScores.updateScores(()=>{
+        progress.style.display="none";
+        if(self!=null){
+            self.disabled=false;
+        }
         updateTable();
     },error=>{
+        progress.style.display="none";
+        if(self!=null){
+            self.disabled=false;
+        }
         console.error(error);
-    });
+    },counter);
 }
 
 document.querySelectorAll(".sorter").forEach(e=>{
@@ -130,20 +150,23 @@ function updateTable(){
 
         for(let i = 0;i<4;i++){
             let td = document.createElement("td");
-            td.draggable=false;
+            let link = document.createElement("a");
+            td.appendChild(link);
+            link.draggable=false;
             switch(i){
                 case 0:
-                    td.innerText=player.name;
-                    td.title=player.name;
+                    link.innerText=player.name;
+                    link.href="https://www.speedrun.com/user/"+player.name;
+                    link.title=player.name;
                     break;
                 case 1:
-                    td.innerText=player.fullgame??"-";
+                    link.innerText=player.fullgame??"-";
                     break;
                 case 2:
-                    td.innerText=player.level??"-";   
+                    link.innerText=player.level??"-"; 
                     break;
                 case 3:
-                    td.innerText=player.total??"-";
+                    link.innerText=player.total??"-";
                     break;
             }
             tr.appendChild(td);
