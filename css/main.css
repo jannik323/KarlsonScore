@@ -111,8 +111,14 @@ table.resulttable tr td:first-child{
     text-overflow: ellipsis;
 }
 
+table.resulttable tr th:hover{
+    background-color: rgba(23, 23, 23, 0.4);
+    cursor: pointer;
+}
+
 table.resulttable tr td:hover{
     background-color: rgba(34, 34, 34, 0.4);
+    cursor:alias;
 }
 
 
@@ -129,6 +135,22 @@ table.resulttable tbody tr {
 
 table.resulttable tbody tr:nth-child(odd) {
     background-color: #555;
+}
+
+span.sorter{
+    display:inline-block;
+}
+
+span.sorter[data-sort="none"]{
+    opacity: 0;
+}
+
+span.sorter[data-sort="asc"]{
+    transform:rotate(90deg);
+}
+
+span.sorter[data-sort="desc"]{
+    transform:rotate(-90deg);
 }
 
 /* categoryselect */

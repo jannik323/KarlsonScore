@@ -48,6 +48,7 @@ function addTopPlayers(self){
     let progress = document.getElementById("progress");
     progress.max=addTopPlayersInput.value;
     progress.style.display="block";
+    progress.value=0;
     let counter = new Counter(()=>{
         progress.value=counter.count;
     });
@@ -85,6 +86,35 @@ function updateScores(){
     },error=>{
         console.error(error);
     });
+}
+
+document.querySelectorAll(".sorter").forEach(e=>{
+    if(e.parentElement.getAttribute("data-sort")==karlsonScores.sortOption.mode){
+        e.setAttribute("data-sort",karlsonScores.sortOption.order);
+    }
+});
+
+function sortTable(self){
+    for (let i = 0; i < self.parentElement.children.length; i++) {
+        if(self.parentElement.children[i]==self)continue;
+        self.parentElement.children[i].lastElementChild.setAttribute("data-sort","none");
+    }
+
+    let sortmodeEle = self.lastElementChild; 
+    switch(sortmodeEle.getAttribute("data-sort")){
+        case "none":
+            sortmodeEle.setAttribute("data-sort","asc");
+            break;
+        case "asc":
+            sortmodeEle.setAttribute("data-sort","desc");
+            break;
+        case "desc":
+            sortmodeEle.setAttribute("data-sort","asc");
+            break;
+    }
+
+    karlsonScores.sortData(self.getAttribute("data-sort"),sortmodeEle.getAttribute("data-sort"));
+    updateTable();
 }
 
 function updateTable(){

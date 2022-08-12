@@ -35,17 +35,31 @@
                 <table class="resulttable marginsmall">
                     <thead>
                         <tr>
-                            <th>Player</th>
-                            <th>FullGame</th>
-                            <th>Level</th>
-                            <th>Total</th>
+                            <th onclick="sortTable(this)" data-sort="name">
+                                <span>Player</span>
+                                <span class="sorter" data-sort="none">></span>
+                            </th>
+                            <th onclick="sortTable(this)" data-sort="fullgame">
+                                <span>FullGame</span>
+                                <span class="sorter" data-sort="none">></span>
+
+                            </th>
+                            <th onclick="sortTable(this)" data-sort="level">
+                                <span>Level</span>
+                                <span class="sorter" data-sort="none">></span>
+
+                            </th>   
+                            <th onclick="sortTable(this)" data-sort="total">
+                                <span>Total</span>
+                                <span class="sorter" data-sort="none">></span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="scoretable">
     
                     </tbody>
                 </table>
-        
+
                 <div class="flexrow marginsmall">
                     <input type="text" id="addPlayerInput" placeholder="Player Name" autocomplete="off">
                     <button class="green" id="addPlayerBtn" onclick="addPlayer(this)">Add Player</button>

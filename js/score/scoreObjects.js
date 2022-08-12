@@ -23,7 +23,7 @@ class Counter{
 class KarlsonScores{
 
     constructor(){
-        this.version=1.2;
+        this.version=1.3;
         this.selcat="any",
         this.cats={
             any:[],
@@ -32,6 +32,7 @@ class KarlsonScores{
         };
         this.nextUpdate=0;
         this.updateTime=3600000*6;
+        this.sortOption={mode:"name",order:"asc"};
         this.#checkLocalStorage();
     }
 
@@ -45,6 +46,7 @@ class KarlsonScores{
         this.cats=karlsonScores.cats
         this.nextUpdate=karlsonScores.nextUpdate;
         this.updateTime=karlsonScores.updateTime;
+        this.sortOption=karlsonScores.sortOption;
     }
 
     #checkLocalStorage(){
@@ -56,8 +58,7 @@ class KarlsonScores{
         }
     }
 
-    #fixLocalStorage(karlsonScores= localStorage.getItem("karlsonScores")){
-
+    #fixLocalStorage(karlsonScores= JSON.parse(localStorage.getItem("karlsonScores"))){
         for (let p in this) {
             // missing property that the parameter karlsonScores object doesnt have
             karlsonScores[p] = karlsonScores[p]??this[p]; 
@@ -92,6 +93,31 @@ class KarlsonScores{
         this.saveKarlsonScores();
     }
 
+    sortData(mode,order){
+        this.#sortData(mode,order);
+        this.sortOption.mode=mode;
+        this.sortOption.order=order;
+        this.saveKarlsonScores();
+    }
+
+    #sortData(mode=this.sortOption.mode,order=this.sortOption.order){
+        this.cats[this.selcat].sort((a,b)=>{
+            if(mode=="name"){
+                if(order=="asc"){
+                    return a[mode].toLowerCase()>b[mode].toLowerCase();
+                }else{
+                    return a[mode].toLowerCase()<b[mode].toLowerCase();
+                }
+            }else{
+                if(order=="asc"){
+                    return (b[mode]*1)-(a[mode]*1);
+                }else{
+                    return (a[mode]*1)-(b[mode]*1);
+                }
+            }
+        });
+    }
+
     hasPlayer(playerName){
         for(let player of this.cats[this.selcat]){
             if(player.name===playerName){
@@ -101,7 +127,7 @@ class KarlsonScores{
         return false;
     }
 
-    addPlayer(playerName,callback,error,options={category:this.selcat}){
+    addPlayer(playerName,callback,error,options={category:this.selcat,series:false}){
         if(this.hasPlayer(playerName)){
             error("player already there");
             return;
@@ -110,7 +136,10 @@ class KarlsonScores{
         karlsonTimes.getPlayerData(player.name,data=>{
             this.cats[player.category].push(player);
             this.#calculateScores(player,data);
-            this.saveKarlsonScores();
+            if(!options.series){
+                this.#sortData();
+                this.saveKarlsonScores();
+            }
             callback();
         },err=>{
             error(err);
@@ -119,11 +148,15 @@ class KarlsonScores{
 
     addPlayerList(playerList,callback=null,options={category:this.selcat,counter:null},num=0){
         if(num>=playerList.length){
+            this.#sortData();
+            this.saveKarlsonScores();
             if(callback!=null)callback();
             return;
         }
         let player = playerList[num];
         if(player==null){
+            this.#sortData();
+            this.saveKarlsonScores();
             if(callback!=null)callback();
             return;
         }
@@ -138,7 +171,7 @@ class KarlsonScores{
             if(options.counter!=null){
                 options.counter.countUp();
             }
-        });
+        },{category:this.selcat,series:true});
     }
 
     addTopPlayers(top,callback,error,options={category:this.selcat,counter:null}){
@@ -198,19 +231,7 @@ class KarlsonScores{
         player.total=(((player.fullgame*1)+(player.level*1))/2).toFixed(2);
     
     }
-    
-    // not rly the scores.... just the sob and fullgame time lol
-    // this could honestly be removed at this point
-    #calculateCommunityScores(player,data){
-    
-        let totalleveltimes = 0;
-        for(let time in data.cats.level[player.category]){
-            totalleveltimes+=data.cats.level[player.category][time];
-        }
-        player.level=totalleveltimes.toFixed(2);
-        player.fullgame=data.cats.fullgame[player.category].toFixed(2);
-        player.total=(totalleveltimes*data.cats.fullgame[player.category]).toFixed(2);
-    }
+
     
     #updatePlayerScoresList(community,playerList,callback=null,num=0){
         if(num>=playerList.length){
@@ -233,6 +254,9 @@ class KarlsonScores{
 
     updateScores(callback,error){
         karlsonTimes.getCommunityData(data=>{
+
+            
+
             // this completly ignores the possible timeout by the speedrun.com api
 
             this.#updatePlayerScoresList(data,karlsonScores.cats.any,

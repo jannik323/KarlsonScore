@@ -52,7 +52,7 @@ class KarlsonTimes{
         this.communitytime=karlsonTimes.communitytime;
     }
 
-    #fixLocalStorage(karlsonTimes= localStorage.getItem("karlsonTimes")){
+    #fixLocalStorage(karlsonTimes= JSON.parse(localStorage.getItem("karlsonTimes"))){
 
         for (let p in this) {
             // missing property that the parameter karlsonTimes object doesnt have
