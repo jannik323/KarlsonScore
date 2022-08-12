@@ -7,6 +7,9 @@
     <title>Karlson Score</title>
     <link rel="icon" type="image/x-icon" href="/KarlsonScore/images/favicon.ico">
     <link rel="stylesheet" href="/KarlsonScore/css/main.css">
+    <script src="/KarlsonScore/js/Ids.js" defer></script>
+    <script src="/KarlsonScore/js/timeObjects.js" defer></script>
+    <script src="/KarlsonScore/js/comparePage.js" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -21,7 +24,35 @@
      
         <div class="flexrow">
 
-            <h1 class="darkfont">COMING SOON</h1>
+            <section class="section" >
+
+                <div id="categoryselect" class="marginsmall">
+                    <span onclick="selectCategory(this)" data-category="any">Any%</span>
+                    <span onclick="selectCategory(this)" data-category="ae">All Enemies</span>
+                    <span onclick="selectCategory(this)" data-category="gunless">Gunless</span>
+                </div>
+                
+                <table class="resulttable nohovertable marginsmall">
+                    <thead>
+                        <tr>
+                            <th >
+                            </th>
+                            <th >
+                                <input type="text" autocomplete="off" placeholder="Player 1" id="player1" onchange="comparePlayerChange()">
+                            </th>
+                            <th >
+                                <input type="text" autocomplete="off" placeholder="Player 1" id="player2" onchange="comparePlayerChange()">
+                            </th>
+                            <th >
+                                Difference
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparetable">
+                        
+                    </tbody>
+
+            </section>
         
         </div>
     </main>

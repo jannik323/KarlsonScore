@@ -16,6 +16,10 @@ body,html{
     overflow-x: hidden;
 }
 
+*::selection{
+    background-color: rgba(135, 135, 135, 0.545);
+}
+
 /* logo */
 
 #logo{
@@ -111,15 +115,27 @@ table.resulttable tr td:first-child{
     text-overflow: ellipsis;
 }
 
+table.resulttable.nohovertable tr td:first-child{
+    max-width: 4rem;
+}
+
 table.resulttable tr th:hover{
     background-color: rgba(23, 23, 23, 0.4);
     cursor: pointer;
+}
+
+table.resulttable.nohovertable tr th:hover{
+    background-color: transparent;
+    cursor: default;
 }
 
 table.resulttable tr td:hover{
     background-color: rgba(34, 34, 34, 0.4);
 }
 
+table.nohovertable tr td:hover{
+    background-color: transparent;
+}
 
 table.resulttable tbody tr:hover{
     scale:1.05
@@ -155,6 +171,26 @@ span.sorter[data-sort="asc"]{
 
 span.sorter[data-sort="desc"]{
     transform:rotate(-90deg);
+}
+
+table.resulttable tr input::selection{
+    background-color: rgba(135, 135, 135, 0.545);
+}
+
+table.resulttable tr td[data-diff=positive]{
+    background-color: rgba(38, 182, 74, 0.4);
+}
+
+table.resulttable tr td[data-diff=negative]{
+    background-color: rgba(182, 38, 38, 0.4);
+}
+
+table.resulttable tr td[data-diff=negative]::before{
+    content:"+"
+}
+
+table.resulttable tr td[data-diff=none]{
+    background-color: rgba(139, 139, 139, 0.4);
 }
 
 /* categoryselect */
