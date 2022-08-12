@@ -37,8 +37,8 @@ document.getElementById("addTopPlayersInput").oninput=e=>{
     if(e.target.value<1){
         e.target.value="";
         btn.disabled=true;
-    }else if(e.target.value>50){
-        e.target.value=50;
+    }else if(e.target.value>100){
+        e.target.value=100;
     }else{
         btn.disabled=false;
     }
