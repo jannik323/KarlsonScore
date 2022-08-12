@@ -32,7 +32,7 @@ class KarlsonScores{
         };
         this.nextUpdate=0;
         this.updateTime=3600000*6;
-        this.sortOption={mode:"name",order:"asc"};
+        this.sortOption={mode:"total",order:"asc"};
         this.#checkLocalStorage();
     }
 
