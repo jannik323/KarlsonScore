@@ -117,14 +117,14 @@ class KarlsonTimes{
     
 
     #getTimeHolder(PlayerName){
-        let timeHolder = this.list.find(t=>t.name===PlayerName);
+        let timeHolder = this.list.find(t=>t.name.toLowerCase()==PlayerName.toLowerCase());
         if(timeHolder==null){
             timeHolder = new TimeHolder(PlayerName); 
             this.list.push(timeHolder);
         }
         return timeHolder;
     }
-
+   
     #fetchPlayerData(timeHolder,callback,error){
         fetch("https://www.speedrun.com/api/v1/users/"+timeHolder.name+"/personal-bests?game="+IDs.karlson+"&max=200").then(response => {
             if (!response.ok) {
@@ -134,7 +134,7 @@ class KarlsonTimes{
             return response.json();
         })
         .then(data=>{
-
+            let timesFix = {};
             for(let rundata of data.data){
                 let run = rundata.run;
                 // sandbox2 all enemies quickfix
@@ -146,15 +146,21 @@ class KarlsonTimes{
                 if(run.level==null){
                     let catName = IDs.findName.cat.full[run.category];
                     if(catName==null)continue;
-                    timeHolder.cats.fullgame[catName]=run.times.primary_t;
+                    if(timesFix[catName]==null||timesFix[catName]>run.times.primary_t){
+                        timeHolder.cats.fullgame[catName]=run.times.primary_t;
+                        timesFix[catName]=run.times.primary_t;
+                    }
                 }else{
                     let levelCatName = IDs.findName.cat.level[run.category];
                     let levelName = IDs.findName.lvl[run.level];
                     if(levelCatName==null||levelName==null)continue;
-                    timeHolder.cats.level[levelCatName][levelName]=run.times.primary_t;
+                    if(timesFix[levelCatName+levelName]==null||timesFix[levelCatName+levelName]>run.times.primary_t){
+                        timeHolder.cats.level[levelCatName][levelName]=run.times.primary_t;
+                        timesFix[levelCatName+levelName]=run.times.primary_t;
+                    }
+                    
                 }
             }
-
             for(let name in timeHolder.cats.fullgame){
                 timeHolder.cats.fullgame[name]=timeHolder.cats.fullgame[name]??-1;
             }
