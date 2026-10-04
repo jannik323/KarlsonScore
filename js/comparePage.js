@@ -52,11 +52,11 @@ function createCompareTable(player1=playerdata.player1,player2=playerdata.player
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
-        td.innerText=player1.cats.level[playerdata.category][level]!=-1?player1.cats.level[playerdata.category][level]:"-";
+        td.innerText=player1.cats.level[playerdata.category][level]!=-1?player1.cats.level[playerdata.category][level].toFixed(2):"-";
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
-        td.innerText=player2.cats.level[playerdata.category][level]!=-1?player2.cats.level[playerdata.category][level]:"-";
+        td.innerText=player2.cats.level[playerdata.category][level]!=-1?player2.cats.level[playerdata.category][level].toFixed(2):"-";
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
@@ -79,11 +79,11 @@ function createCompareTable(player1=playerdata.player1,player2=playerdata.player
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
-        td.innerText=player1.cats.fullgame[playerdata.category]!=-1?player1.cats.fullgame[playerdata.category]:"-";
+        td.innerText=player1.cats.fullgame[playerdata.category]!=-1?player1.cats.fullgame[playerdata.category].toFixed(2):"-";
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
-        td.innerText=player2.cats.fullgame[playerdata.category]!=-1?player2.cats.fullgame[playerdata.category]:"-";
+        td.innerText=player2.cats.fullgame[playerdata.category]!=-1?player2.cats.fullgame[playerdata.category].toFixed(2):"-";
         tr.appendChild(td);}
 
         {let td = document.createElement("td");
