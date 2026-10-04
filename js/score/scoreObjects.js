@@ -184,7 +184,7 @@ class KarlsonScores{
             return response.json();
         })
         .then(data=>{
-            this.addPlayerList(data.data.players.data.map(e=>e.names.international),callback,{category:options.category,counter:options.counter});
+            this.addPlayerList(data.data.players.data.filter(e=>e.names!=null).map(e=>e.names.international?e.names.international:e.name.japanese),callback,{category:options.category,counter:options.counter});
         })
         .catch(errordata=>error(errordata));
     }
